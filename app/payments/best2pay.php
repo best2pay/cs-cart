@@ -118,7 +118,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
         $fiscalPositions.='1;';
         $fiscalPositions.=($order_info['shipping_cost']*100).';';
         $fiscalPositions.=$TAX.';';
-        $fiscalPositions.='shipping'.'|';
+        $fiscalPositions.='Доставка'.'|';
     }
     $fiscalPositions = substr($fiscalPositions, 0, -1);
 
