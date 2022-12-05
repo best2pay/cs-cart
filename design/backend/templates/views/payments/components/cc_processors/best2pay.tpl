@@ -14,6 +14,14 @@
 </div>
 
 <div class="form-field">
+	<label for="halva">Халва Частями:</label>
+	<input type="hidden" name="payment_data[processor_params][halva]" value="0">
+	<input type="checkbox" name="payment_data[processor_params][halva]" id="halva" value="1" {if $processor_params.halva == "1"} checked="checked"{/if}>
+	<p class="muted description">Способ оплаты только Халва Частями</p>
+</div>
+
+
+<div class="form-field">
 	<label for="test">Тестовый режим:</label>
 	<select name="payment_data[processor_params][test]" id="test">
 		<option value="1" {if $processor_params.test == "1"}selected="selected"{/if}>Yes</option>
