@@ -20,7 +20,6 @@
 	<p class="muted description">Способ оплаты только Халва Частями</p>
 </div>
 
-
 <div class="form-field">
 	<label for="test">Тестовый режим:</label>
 	<select name="payment_data[processor_params][test]" id="test">
