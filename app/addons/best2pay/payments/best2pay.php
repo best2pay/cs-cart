@@ -33,23 +33,25 @@ if(defined('PAYMENT_NOTIFICATION')){
 		];
 		fn_best2pay_sign_data($data, $params);
 		$url = fn_best2pay_get_url($params) . '/webapi/Operation';
+		$operation = [];
+		$operation_is_valid = false;
 		try {
 			$response = Http::post($url, $data);
-			$response_xml = fn_best2pay_parse_xml($response);
-			$operation_approved = fn_best2pay_is_operation_approved($response_xml, $params);
+			$operation = fn_best2pay_parse_xml($response);
+			$operation_is_valid = fn_best2pay_operation_is_valid($operation, $params);
 		} catch(Exception $e) {
 			fn_set_notification('E', 'Error', $e->getMessage());
-			return [CONTROLLER_STATUS_REDIRECT, fn_url()];
+			fn_order_placement_routines('route', $order_id);
 		}
 		
 		$pp_response['order_id'] = $native_id;
-		$pp_response['status'] = $response_xml['order_state'];
+		$pp_response['status'] = $operation['order_state'];
 		$pp_response['payment_type'] = !empty($params['payment_type']) ? $params['payment_type'] : '';
 		$pp_response['currency'] = 'RUB';
-		$pp_response['amount'] = (!empty($response_xml['buyIdSumAmount']) ? $response_xml['buyIdSumAmount'] : $response_xml['amount']) / 100;
+		$pp_response['amount'] = (!empty($operation['buyIdSumAmount']) ? $operation['buyIdSumAmount'] : $operation['amount']) / 100;
 		
-		if($operation_approved)
-			$pp_response['order_status'] = fn_best2pay_get_custom_order_status($response_xml['type'], $params);
+		if($operation_is_valid && $operation['state'] === BEST2PAY_OPERATION_APPROVED && in_array($operation['type'], BEST2PAY_PAYMENT_TYPES))
+			$pp_response['order_status'] = fn_best2pay_get_custom_order_status($operation['type'], $params);
 		else
 			$pp_response['order_status'] = OrderStatuses::FAILED;
 		
@@ -71,9 +73,9 @@ if(defined('PAYMENT_NOTIFICATION')){
 			$processor_data = fn_get_payment_method_data((int) $order_info['payment_id']);
 			$params = !empty($processor_data['processor_params']) ? $processor_data['processor_params'] : [];
 			try {
-				$operation_approved = fn_best2pay_is_operation_approved($response_xml, $params);
-				if(!$operation_approved)
-					throw new Exception(__('best2pay.operation_not_approved'));
+				$operation_is_valid = fn_best2pay_operation_is_valid($response_xml, $params);
+				if(!$operation_is_valid)
+					throw new Exception(__('best2pay.operation_not_valid'));
 			} catch(Exception $e) {
 				die($e->getMessage());
 			}
@@ -132,7 +134,7 @@ if(defined('PAYMENT_NOTIFICATION')){
 		}
 	} catch(Exception $e){
 		fn_set_notification('E', 'Error', $e->getMessage());
-		return [CONTROLLER_STATUS_REDIRECT, fn_url()];
+		fn_redirect('checkout.checkout');
 	}
 	
 	$args = [
