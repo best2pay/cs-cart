@@ -150,6 +150,10 @@ msgctxt "Languages::best2pay.operation_not_approved"
 msgid "Operation not approved"
 msgstr "Operation not approved"
 
+msgctxt "Languages::best2pay.operation_not_valid"
+msgid "Operation not valid"
+msgstr "Operation not valid"
+
 msgctxt "Languages::best2pay.no_order_id"
 msgid "Order ID does not exist"
 msgstr "Order ID does not exist"

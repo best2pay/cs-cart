@@ -9,8 +9,6 @@ if($mode == 'refund') {
 	$params = !empty($processor_data['processor_params']) ? $processor_data['processor_params'] : [];
 	try {
 		$pp_response = fn_best2pay_order_refund($order_info, $params);
-		if(!$pp_response)
-			throw new Exception(__('best2pay.operation_not_approved'));
 	} catch(Exception $e) {
 		fn_set_notification('E', 'ERROR', $e->getMessage());
 		return [CONTROLLER_STATUS_OK, 'orders.details?order_id=' . $order_id];
@@ -29,8 +27,6 @@ if($mode == 'refund') {
 	$params = !empty($processor_data['processor_params']) ? $processor_data['processor_params'] : [];
 	try {
 		$pp_response = fn_best2pay_order_complete($order_info, $params);
-		if(!$pp_response)
-			throw new Exception(__('best2pay.operation_not_approved'));
 	} catch(Exception $e) {
 		fn_set_notification('E', 'ERROR', $e->getMessage());
 		return [CONTROLLER_STATUS_OK, 'orders.details?order_id=' . $order_id];

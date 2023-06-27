@@ -151,6 +151,10 @@ msgctxt "Languages::best2pay.operation_not_approved"
 msgid "Operation not approved"
 msgstr "Операция не одобрена"
 
+msgctxt "Languages::best2pay.operation_not_valid"
+msgid "Operation not valid"
+msgstr "Операция недействительна"
+
 msgctxt "Languages::best2pay.no_order_id"
 msgid "Order ID does not exist"
 msgstr "ID заказа не существует"

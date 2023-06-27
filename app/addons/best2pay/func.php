@@ -70,7 +70,7 @@ function fn_best2pay_parse_xml($string) {
 	return $valid_xml;
 }
 
-function fn_best2pay_is_operation_approved($response, $params) {
+function fn_best2pay_operation_is_valid($response, $params) {
 	if(empty($response['reason_code']) && !empty($response['code']) && !empty($response['description']))
 		throw new Exception($response['code'] . " : " . $response['description']);
 	if(empty($response['signature']))
@@ -82,7 +82,7 @@ function fn_best2pay_is_operation_approved($response, $params) {
 		throw new Exception(__('best2pay.invalid_signature'));
 	if(!in_array($response['type'], BEST2PAY_SUPPORTED_TYPES))
 		throw new Exception(__('best2pay.unknown_operation') . ' : ' . $response['type']);
-	return ($response['state'] == 'APPROVED');
+	return true;
 }
 
 function fn_best2pay_calc_fiscal_positions_shop_cart($order_info, $tax) {
@@ -163,8 +163,10 @@ function fn_best2pay_order_refund($order_info, $params) {
 	$url = fn_best2pay_get_url($params) . $path;
 	$response = Http::post($url, $data);
 	$response_xml = fn_best2pay_parse_xml($response);
-	if (!fn_best2pay_is_operation_approved($response_xml, $params))
-		return [];
+	if (!fn_best2pay_operation_is_valid($response_xml, $params))
+		throw new Exception(__('best2pay.operation_not_valid'));
+	if($response_xml['state'] !== BEST2PAY_OPERATION_APPROVED)
+		throw new Exception(__('best2pay.operation_not_approved'));
 	return ['status' => $response_xml['order_state']];
 }
 
@@ -176,8 +178,10 @@ function fn_best2pay_order_complete($order_info, $params) {
 	$url = fn_best2pay_get_url($params) . $path;
 	$response = Http::post($url, $data);
 	$response_xml = fn_best2pay_parse_xml($response);
-	if (!fn_best2pay_is_operation_approved($response_xml, $params))
-		return [];
+	if (!fn_best2pay_operation_is_valid($response_xml, $params))
+		throw new Exception(__('best2pay.operation_not_valid'));
+	if($response_xml['state'] !== BEST2PAY_OPERATION_APPROVED)
+		throw new Exception(__('best2pay.operation_not_approved'));
 	return ['status' => $response_xml['order_state']];
 }
 
